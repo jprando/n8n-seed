@@ -1,6 +1,6 @@
 services:
 
-  n8n-srv:
+  service:
     image: docker.n8n.io/n8nio/n8n
     restart: unless-stopped
     environment:
@@ -18,10 +18,10 @@ services:
     expose:
       - 5678
     depends_on:
-      pgsql-db:
+      database:
         condition: service_healthy
 
-  pgsql-db:
+  database:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
