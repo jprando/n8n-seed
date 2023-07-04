@@ -1,0 +1,38 @@
+services:
+
+  n8n-srv:
+    image: docker.n8n.io/n8nio/n8n
+    restart: unless-stopped
+    environment:
+      - DB_TYPE
+      - DB_POSTGRESDB_DATABASE
+      - DB_POSTGRESDB_HOST
+      - DB_POSTGRESDB_PORT
+      - DB_POSTGRESDB_USER
+      - DB_POSTGRESDB_SCHEMA
+      - DB_POSTGRESDB_PASSWORD
+    volumes:
+      - "${PWD}/n8n-data:/home/node/.n8n"
+    ports:
+      - 5678:5678
+    expose:
+      - 5678
+    depends_on:
+      pgsql-db:
+        condition: service_healthy
+
+  pgsql-db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - "${PWD}/pgsql-data:/var/lib/postgres/data"
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
